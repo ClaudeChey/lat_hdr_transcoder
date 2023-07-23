@@ -1,0 +1,53 @@
+PODS:
+  - Flutter (1.0.0)
+  - image_picker_ios (0.0.1):
+    - Flutter
+  - integration_test (0.0.1):
+    - Flutter
+  - lat_hdr_transcoder (0.0.1):
+    - Flutter
+  - light_compressor (1.0.0):
+    - Flutter
+  - photo_manager (2.0.0):
+    - Flutter
+    - FlutterMacOS
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - lat_hdr_transcoder (from `.symlinks/plugins/lat_hdr_transcoder/ios`)
+  - light_compressor (from `.symlinks/plugins/light_compressor/ios`)
+  - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  lat_hdr_transcoder:
+    :path: ".symlinks/plugins/lat_hdr_transcoder/ios"
+  light_compressor:
+    :path: ".symlinks/plugins/light_compressor/ios"
+  photo_manager:
+    :path: ".symlinks/plugins/photo_manager/ios"
+  video_player_avfoundation:
+    :path: ".symlinks/plugins/video_player_avfoundation/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
+  integration_test: 13825b8a9334a850581300559b8839134b124670
+  lat_hdr_transcoder: 353f5d16e12d53f482cc147b5a406b97e38e1a29
+  light_compressor: 0b2cd9485749052fa6d6aaf4a600b48f1581abe5
+  photo_manager: 4f6810b7dfc4feb03b461ac1a70dacf91fba7604
+  video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
+
+PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+
+COCOAPODS: 1.12.1
