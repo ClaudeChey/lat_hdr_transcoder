@@ -43,7 +43,8 @@ class _VideoViewState extends State<VideoView> with WidgetsBindingObserver {
   }
 
   Future<void> initController() async {
-    controller = VideoPlayerController.file(File(widget.path));
+    final file = File(widget.path);
+    controller = VideoPlayerController.file(file);
     controller.setLooping(true);
     controller.play();
     controller.initialize().then((value) {

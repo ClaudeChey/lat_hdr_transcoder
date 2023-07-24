@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lat_hdr_transcoder/lat_hdr_transcoder.dart';
 
@@ -23,8 +25,13 @@ class _SelectedVideoState extends State<SelectedVideo> {
   String? convertedPath;
   bool converting = false;
 
+  StreamSubscription? updateProgress;
+  double progress = 0;
+
   @override
   void dispose() {
+    updateProgress?.cancel();
+    updateProgress = null;
     super.dispose();
   }
 
@@ -35,14 +42,21 @@ class _SelectedVideoState extends State<SelectedVideo> {
   }
 
   Future<void> _converting() async {
+    updateProgress?.cancel();
+    updateProgress = LatHdrTranscoder().onProgressUpdated.listen((event) {
+      progress = event;
+      setState(() {});
+    });
+
     converting = true;
     setState(() {});
 
     final coder = TranscoderLatHdr(path: widget.path);
     // final coder = TranscoderLightCompresor(path: widget.path);
-
     convertedPath = await coder.transcoding();
+
     converting = false;
+    updateProgress?.cancel();
     setState(() {});
     print('converted path: $convertedPath');
   }
@@ -75,9 +89,16 @@ class _SelectedVideoState extends State<SelectedVideo> {
 
   Widget _buildConvertButton() {
     if (converting) {
-      return const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: CircularProgressIndicator.adaptive(),
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator.adaptive(),
+          ),
+          Text((progress * 100).toStringAsFixed(0)),
+        ],
       );
     }
 

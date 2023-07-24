@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:lat_hdr_transcoder/lat_hdr_transcoder.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import 'pick/photos_button.dart';
@@ -37,14 +40,32 @@ class _MyAppState extends State<MyApp> {
             },
           ),
           actions: [
+            IconButton.outlined(
+              onPressed: () async {
+                final result = await LatHdrTranscoder().clearCache();
+                print("clear cache result: $result");
+              },
+              icon: const Icon(
+                Icons.cleaning_services_rounded,
+                color: Colors.white,
+              ),
+            ),
             PhotosButton(
               onSelectedAsset: (asset) async {
                 if (asset.type != AssetType.video) {
                   print("Not video file");
                   return;
                 }
-                final file = await asset.loadFile(isOrigin: true);
+                File? file = await asset.loadFile(isOrigin: true);
                 if (file == null) return;
+
+                final extensionSplit = file.uri.pathSegments.last.split('.');
+                final extension = extensionSplit.last;
+                debugPrint(file.path);
+                if (extension.toLowerCase() != "mp4") {
+                  file = await file.rename('${file.path}.mp4');
+                }
+
                 selectedVideoPath = file.path;
                 setState(() {});
               },
