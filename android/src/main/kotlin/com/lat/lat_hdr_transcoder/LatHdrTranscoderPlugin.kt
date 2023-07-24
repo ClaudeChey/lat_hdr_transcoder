@@ -19,6 +19,7 @@ import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_T
 import androidx.media3.transformer.Transformer.PROGRESS_STATE_NOT_STARTED
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -26,13 +27,17 @@ import io.flutter.plugin.common.MethodChannel.Result
 import java.io.File
 
 /** LatHdrTranscoderPlugin */
-class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
+class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
     companion object {
         const val TAG = "LatHdrTranscoderPlugin"
     }
 
-    private lateinit var channel: MethodChannel
     private lateinit var context: Context
+
+    private val sdrDirName = "_sdr_"
+    private lateinit var channel: MethodChannel
+    private lateinit var eventChannel: EventChannel
+    private var eventSink: EventChannel.EventSink? = null
 
     private fun log(value: String) {
         Log.d(TAG, value)
@@ -42,11 +47,26 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
         context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "lat_hdr_transcoder")
         channel.setMethodCallHandler(this)
+
+        eventChannel =
+            EventChannel(flutterPluginBinding.binaryMessenger, "lat_hdr_transcode/stream")
+        eventChannel.setStreamHandler(this)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        eventChannel.setStreamHandler(null)
     }
+
+    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        eventSink = events
+    }
+
+    override fun onCancel(arguments: Any?) {
+        eventSink = null
+    }
+
+
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         log("${call.method}, ${call.arguments}")
@@ -64,6 +84,10 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
                 }
                 isHDR(path, result)
             }
+            "clearCache" -> {
+                result.success(clearCache())
+            }
+
             "transcode" -> {
                 val path = call.argument<String?>("path")
                 if (path == null) {
@@ -122,7 +146,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
         deleteFile(outputPath)
 
         val request = TransformationRequest.Builder()
-            .setVideoMimeType(MimeTypes.VIDEO_H264)
             .setHdrMode(hdrToneMap())
             .build()
 
@@ -138,6 +161,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
 
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 log("completed: $outputPath")
+                eventSink?.success(1.0)
                 result.success(outputPath)
             }
         }
@@ -150,9 +174,10 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
         transformer.start(MediaItem.fromUri(inputUri), outputPath)
 
         var currentProgress = 0.0
+        eventSink?.success(0.0)
         val progressHolder = ProgressHolder()
-        val mainHandler = Handler(context.mainLooper)
-        mainHandler.post(object : Runnable {
+        val handler = Handler(context.mainLooper)
+        handler.post(object : Runnable {
             override fun run() {
                 val state = transformer.getProgress(progressHolder)
                 if (state != PROGRESS_STATE_NOT_STARTED) {
@@ -160,8 +185,9 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
                     if (current != currentProgress) {
                         currentProgress = current
                         log("$currentProgress")
+                        eventSink?.success(currentProgress)
                     }
-                    mainHandler.postDelayed(this,  /* delayMillis = */16)
+                    handler.postDelayed(this, 100)
                 }
             }
         })
@@ -176,14 +202,26 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    private fun sdrDirectory(): File {
+        return File(context.cacheDir, sdrDirName)
+    }
+
+    private fun clearCache(): Boolean {
+        if (sdrDirectory().exists()) {
+            return sdrDirectory().deleteRecursively()
+        }
+        return true
+    }
+
     private fun createOutputPath(path: String): String {
         val uri = Uri.parse(path)
-        val fileName = uri.lastPathSegment // 파일 이름 추출
-        val newFileName =
-            "${fileName?.substringBeforeLast(".")}_sdr.${fileName?.substringAfterLast(".")}"
+        val fileName = uri.lastPathSegment
 
-        val tempDir = context.cacheDir
-        val sdrDir = File(tempDir, "sdr")
+        val name = fileName?.substringBeforeLast(".")
+        val ext = fileName?.substringAfterLast(".")
+        val newFileName = "${name}_sdr.${ext}"
+
+        val sdrDir = sdrDirectory()
         if (!sdrDir.exists()) {
             sdrDir.mkdir()
         }
@@ -202,5 +240,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler {
     private fun uriFromFilePath(path: String): Uri {
         return FileProvider.getUriForFile(context, context.packageName, File(path))
     }
+
 
 }

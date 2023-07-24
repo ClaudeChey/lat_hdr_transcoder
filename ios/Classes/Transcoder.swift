@@ -29,17 +29,17 @@ class Transcoder {
         
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)
         guard let session = exportSession else {
-            completion(NSError(domain: "com.example.videoconvert", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAssetExportSession"]))
+            completion(NSError(domain: Bundle.main.bundleIdentifier!, code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create AVAssetExportSession"]))
             return
         }
         
-        var latestProgress = 0.0
-        progression(latestProgress)
+        var progress = 0.0
+        progression(progress)
         let progressTimer: Timer = Timer(timeInterval: 0.1, repeats: true, block: { timer in
             let value = Double(session.progress)
-            guard latestProgress != value else { return }
-            latestProgress = value
-            progression(latestProgress)
+            guard progress != value else { return }
+            progress = value
+            progression(progress)
         })
         RunLoop.main.add(progressTimer, forMode: .common)
         
