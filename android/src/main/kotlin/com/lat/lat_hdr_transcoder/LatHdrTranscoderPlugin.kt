@@ -103,9 +103,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun isHDR(path: String, @NonNull result: Result) {
-        val inputUri = uriFromFilePath(path)
-        val item = MediaItem.fromUri(inputUri)
-
         val extractor = MediaExtractor()
         extractor.setDataSource(path)
         val trackLength = extractor.trackCount - 1;
