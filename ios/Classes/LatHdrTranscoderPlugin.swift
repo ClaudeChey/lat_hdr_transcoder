@@ -7,6 +7,11 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     
     private var eventSink: FlutterEventSink?
     
+    
+    private func log(text: String) {
+        print(text)
+    }
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "lat_hdr_transcoder", binaryMessenger: registrar.messenger())
         let instance = LatHdrTranscoderPlugin()
@@ -28,7 +33,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        print("\(call.method), \(String(describing: call.arguments))")
+        log(text: "\(call.method), \(String(describing: call.arguments))")
         switch call.method {
         case "isHDR":
             guard let args = call.arguments as? [String: Any],
@@ -65,12 +70,13 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
             }
             
             Transcoder().convert(inputURL: inputURL, outputURL: outputURL) { progress in
-                print(progress)
+                self.log(text: "\(progress)")
                 self.eventSink?(progress)
             } completion: { error in
                 if let error = error {
                     TranscodeErrorType.failedConvert.occurs(result: result, extra: error.localizedDescription)
                 } else {
+                    self.eventSink?(1.0)
                     result(outputURL.relativePath)
                 }
             }
@@ -91,8 +97,6 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
         return newURL
     }
     
-    
-    
     private func clearCache() -> Bool {
         let url = cacheDirURL()
         
@@ -106,7 +110,6 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
         }
         return true
     }
-    
 
     private func createTempDirIfNot() -> URL {
         let url = cacheDirURL()
@@ -114,7 +117,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
             return url
         } catch {
-            print(error)
+            log(text: error.localizedDescription)
             return url
         }
     }
@@ -129,7 +132,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
             try manager.removeItem(atPath: url.relativePath)
             return true
         } catch  {
-            print("error \(error)")
+            log(text: "error \(error)")
             return false
         }
         

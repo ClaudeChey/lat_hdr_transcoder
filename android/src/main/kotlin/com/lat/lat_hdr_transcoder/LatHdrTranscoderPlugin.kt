@@ -40,7 +40,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
     private var eventSink: EventChannel.EventSink? = null
 
     private fun log(value: String) {
-        Log.d(TAG, value)
+//        Log.d(TAG, value)
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
