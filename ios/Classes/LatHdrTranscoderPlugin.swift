@@ -9,7 +9,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
     
     
     private func log(text: String) {
-        print(text)
+//        print(text)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
