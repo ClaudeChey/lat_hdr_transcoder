@@ -24,7 +24,7 @@ class Transcoder {
         return isHdr
     }
     
-    func convert(inputURL: URL, outputURL: URL, progression: @escaping (Double) -> Void, completion: @escaping (Error?) -> Void){
+    func transcoding(inputURL: URL, outputURL: URL, progression: @escaping (Double) -> Void, completion: @escaping (Error?) -> Void){
         let asset = AVURLAsset(url: inputURL)
         
         let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)

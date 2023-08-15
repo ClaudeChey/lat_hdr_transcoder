@@ -9,10 +9,10 @@ enum class TranscodeErrorType(val rawValue: Int) {
     ExistsOutputFile(2),
     FailedTranscode(3);
 
-    val code: String
+    private val code: String
         get() = "$rawValue"
 
-    fun message(extra: String?): String {
+    private fun message(extra: String?): String {
         return when (this) {
             InvalidArgs -> "argument are not valid"
             NotSupportVersion -> "os version is not supported: $extra"

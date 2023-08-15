@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lat_hdr_transcoder/lat_hdr_transcoder.dart';
 
-import '../transcoder.dart';
 import 'video_view.dart';
 
 class SelectedVideo extends StatefulWidget {
@@ -38,12 +38,11 @@ class _SelectedVideoState extends State<SelectedVideo> {
   @override
   void initState() {
     super.initState();
-    print('origin path: ${widget.path}');
+    debugPrint(widget.path);
   }
 
   Future<void> _converting() async {
-    updateProgress?.cancel();
-    updateProgress = LatHdrTranscoder().onProgressUpdated.listen((event) {
+    updateProgress = LatHdrTranscoder().onProgress.listen((event) {
       progress = event;
       setState(() {});
     });
@@ -51,14 +50,16 @@ class _SelectedVideoState extends State<SelectedVideo> {
     converting = true;
     setState(() {});
 
-    final coder = TranscoderLatHdr(path: widget.path);
-    // final coder = TranscoderLightCompresor(path: widget.path);
-    convertedPath = await coder.transcoding();
+    try {
+      convertedPath = await LatHdrTranscoder().transcoding(widget.path);
+    } on PlatformException catch (e) {
+      debugPrint(e.toString());
+    }
 
     converting = false;
     updateProgress?.cancel();
     setState(() {});
-    print('converted path: $convertedPath');
+    debugPrint(convertedPath);
   }
 
   @override
@@ -80,7 +81,7 @@ class _SelectedVideoState extends State<SelectedVideo> {
   Widget _buildCheckHdrButton() {
     return ElevatedButton(
       onPressed: () async {
-        isHdr = await LatHdrTranscoder().isHDR(widget.path);
+        isHdr = await LatHdrTranscoder().isHdr(widget.path);
         setState(() {});
       },
       child: const Text('1. check HDR'),

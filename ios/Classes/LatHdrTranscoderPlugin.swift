@@ -54,7 +54,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
         case "clearCache":
             result(clearCache())
             
-        case "transcode":
+        case "transcoding":
             guard let args = call.arguments as? [String: Any],
                   let path = args["path"] as? String else {
                 TranscodeErrorType.invalidArgs.occurs(result: result)
@@ -69,7 +69,7 @@ public class LatHdrTranscoderPlugin: NSObject, FlutterPlugin, FlutterStreamHandl
                 return
             }
             
-            Transcoder().convert(inputURL: inputURL, outputURL: outputURL) { progress in
+            Transcoder().transcoding(inputURL: inputURL, outputURL: outputURL) { progress in
                 self.log(text: "\(progress)")
                 self.eventSink?(progress)
             } completion: { error in

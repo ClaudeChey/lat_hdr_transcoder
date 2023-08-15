@@ -5,7 +5,6 @@ import 'package:lat_hdr_transcoder/lat_hdr_transcoder.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import 'pick/photos_button.dart';
-import 'pick/picker_button.dart';
 import 'presentation/selected_video.dart';
 
 void main() {
@@ -33,27 +32,29 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Plugin example app'),
-          leading: PickerButton(
-            onSelectedPickFile: (pickFile) {
-              selectedVideoPath = pickFile.xfile.path;
-              setState(() {});
-            },
-          ),
           actions: [
-            IconButton.outlined(
-              onPressed: () async {
-                final result = await LatHdrTranscoder().clearCache();
-                print("clear cache result: $result");
-              },
-              icon: const Icon(
-                Icons.cleaning_services_rounded,
-                color: Colors.white,
-              ),
-            ),
+            Builder(builder: (context) {
+              return IconButton.outlined(
+                onPressed: () async {
+                  final result = await LatHdrTranscoder().clearCache();
+                  debugPrint(result.toString());
+
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Clear cache')),
+                    );
+                  }
+                },
+                icon: const Icon(
+                  Icons.cleaning_services_rounded,
+                  color: Colors.white,
+                ),
+              );
+            }),
             PhotosButton(
               onSelectedAsset: (asset) async {
                 if (asset.type != AssetType.video) {
-                  print("Not video file");
+                  debugPrint("video file is not");
                   return;
                 }
                 File? file = await asset.loadFile(isOrigin: true);

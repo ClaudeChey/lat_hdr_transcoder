@@ -1,6 +1,6 @@
 name: lat_hdr_transcoder
-description: A new Flutter plugin project.
-version: 0.0.5
+description: Check if video file is in HDR format and convert to SDR
+version: 1.0.0
 homepage:
 
 environment:
