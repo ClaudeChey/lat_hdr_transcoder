@@ -22,20 +22,16 @@ See the [example app](https://github.com/ClaudeChey/lat_hdr_transcoder/blob/main
 dependencies:
   lat_hdr_transcoder: ^1.0.0
 ```
-<br/>
 
 # Android
 
 ```transcoding``` supported 29+
-
-<br/>
 
 
 # iOS
 
 ```isHdr``` supported 14+
 
-<br/>
 
 
 # How to use

@@ -1,6 +1,6 @@
 name: lat_hdr_transcoder
-description: Check if video file is in HDR format and convert to SDR
-version: 1.0.0
+description: It checks if the video file is in HDR format and converts HDR video to SDR video
+version: 1.0.1
 homepage: https://latlonele-prod.web.app
 repository: https://github.com/ClaudeChey/lat_hdr_transcoder
 
