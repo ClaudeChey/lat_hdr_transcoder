@@ -1,17 +1,20 @@
 package com.lat.lat_hdr_transcoder
 
 import android.content.Context
+import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import androidx.annotation.NonNull
+import androidx.annotation.OptIn
 import androidx.core.content.FileProvider
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.*
-import androidx.media3.transformer.TransformationRequest.HdrMode
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
+import androidx.media3.transformer.Composition.HdrMode
+import androidx.media3.transformer.Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
+import androidx.media3.transformer.Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
+import androidx.media3.transformer.Transformer.PROGRESS_STATE_NOT_STARTED
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
@@ -127,7 +130,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         result.success(isHdr)
     }
 
-    private fun transcoding(path: String, @NonNull result: Result) {
+    @OptIn(UnstableApi::class) private fun transcoding(path: String, @NonNull result: Result) {
         val inputUri = uriFromFilePath(path)
         val outputPath = createOutputPath(path)
         log("input: $path")
@@ -173,11 +176,12 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         val progressHolder = ProgressHolder()
         val handler = Handler(context.mainLooper)
         handler.post(object : Runnable {
-            override fun run() {
+            @OptIn(UnstableApi::class) override fun run() {
                 val state = transformer.getProgress(progressHolder)
                 if (state != PROGRESS_STATE_NOT_STARTED) {
                     val current = progressHolder.progress * 0.01
-                    if (current != currentProgress) {
+                    if (current != currentProgress
+                    ) {
                         currentProgress = current
                         log("$currentProgress")
                         eventSink?.success(currentProgress)
@@ -188,13 +192,13 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         })
     }
 
-    private fun hdrToneMap(): HdrMode {
+    @UnstableApi private fun hdrToneMap(): Int {
         return if (Build.VERSION.SDK_INT >= 33) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
+            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
         } else if (Build.VERSION.SDK_INT >= 29) {
             HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         } else {
-            HdrMode.NONE
+            -1
         }
     }
 
