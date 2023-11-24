@@ -1,22 +1,17 @@
 package com.lat.lat_hdr_transcoder
 
 import android.content.Context
-import android.media.MediaExtractor
-import android.media.MediaFeature
-import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 import androidx.annotation.NonNull
-import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.transformer.*
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR
+import androidx.media3.transformer.TransformationRequest.HdrMode
+import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
 import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
-import androidx.media3.transformer.Transformer.PROGRESS_STATE_NOT_STARTED
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
@@ -27,7 +22,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import java.io.File
 
 /** LatHdrTranscoderPlugin
- * mininum version 29 */
+ * Minimum version 29 */
 
 class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
     companion object {
@@ -42,7 +37,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
     private var eventSink: EventChannel.EventSink? = null
 
     private fun log(value: String) {
-//        Log.d(TAG, value)
+        // Log.d(TAG, value)
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -67,7 +62,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
     override fun onCancel(arguments: Any?) {
         eventSink = null
     }
-
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         log("${call.method}, ${call.arguments}")
@@ -133,7 +127,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         result.success(isHdr)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun transcoding(path: String, @NonNull result: Result) {
         val inputUri = uriFromFilePath(path)
         val outputPath = createOutputPath(path)
@@ -142,8 +135,8 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         deleteFile(outputPath)
 
         val toneMap = hdrToneMap()
-        if (toneMap == -1) {
-            TranscodeErrorType.NotSupportVersion.occurs(result);
+        if (toneMap == HdrMode.NONE) {
+            TranscodeErrorType.NotSupportVersion.occurs(result)
             return
         }
 
@@ -193,16 +186,15 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
                 }
             }
         })
-
     }
 
-    private fun hdrToneMap(): Int {
+    private fun hdrToneMap(): HdrMode {
         return if (Build.VERSION.SDK_INT >= 33) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR
-        } else if (Build.VERSION.SDK_INT >= 29) {
             HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
+        } else if (Build.VERSION.SDK_INT >= 29) {
+            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         } else {
-            -1
+            HdrMode.NONE
         }
     }
 
@@ -242,7 +234,6 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
     }
 
     private fun uriFromFilePath(path: String): Uri {
-        return FileProvider.getUriForFile(context, context.packageName+ ".provider", File(path))
+        return FileProvider.getUriForFile(context, context.packageName + ".provider", File(path))
     }
-
 }
