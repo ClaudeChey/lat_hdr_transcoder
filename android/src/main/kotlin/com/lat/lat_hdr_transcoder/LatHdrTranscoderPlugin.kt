@@ -12,9 +12,6 @@ import androidx.core.content.FileProvider
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.*
-import androidx.media3.transformer.Composition.HdrMode
-import androidx.media3.transformer.Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
-import androidx.media3.transformer.Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
 import androidx.media3.transformer.Transformer.PROGRESS_STATE_NOT_STARTED
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -143,8 +140,9 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
             TranscodeErrorType.NotSupportVersion.occurs(result)
             return
         }
-
-        val request = TransformationRequest.Builder()
+        val editedMediaItem =
+            EditedMediaItem.Builder(MediaItem.fromUri(inputUri)).build()
+        val composition = Composition.Builder(EditedMediaItemSequence(editedMediaItem))
             .setHdrMode(toneMap)
             .build()
 
@@ -166,11 +164,9 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         }
 
         val transformer = Transformer.Builder(context)
-            .setTransformationRequest(request)
             .addListener(transformerOnListener)
             .build()
-
-        transformer.start(MediaItem.fromUri(inputUri), outputPath)
+        transformer.start(composition, outputPath)
 
         var currentProgress = 0.0
         eventSink?.success(0.0)
@@ -195,9 +191,9 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
 
     @UnstableApi private fun hdrToneMap(): Int {
         return if (Build.VERSION.SDK_INT >= 33) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
+            Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
         } else if (Build.VERSION.SDK_INT >= 29) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
+            Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         } else {
             -1
         }
