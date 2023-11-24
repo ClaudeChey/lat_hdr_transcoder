@@ -14,8 +14,8 @@ import androidx.core.content.FileProvider
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.transformer.*
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
-import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
+import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR
+import androidx.media3.transformer.TransformationRequest.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
 import androidx.media3.transformer.Transformer.PROGRESS_STATE_NOT_STARTED
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -198,9 +198,9 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
 
     private fun hdrToneMap(): Int {
         return if (Build.VERSION.SDK_INT >= 33) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
+            HDR_MODE_TONE_MAP_HDR_TO_SDR
         } else if (Build.VERSION.SDK_INT >= 29) {
-            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
+            HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_SHADER
         } else {
             -1
         }
