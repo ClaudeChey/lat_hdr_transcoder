@@ -1,6 +1,7 @@
 package com.lat.lat_hdr_transcoder
 
 import android.content.Context
+import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
 import android.os.Build
@@ -138,7 +139,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
         deleteFile(outputPath)
 
         val toneMap = hdrToneMap()
-        if (toneMap == HdrMode.NONE) {
+        if (toneMap == -1) {
             TranscodeErrorType.NotSupportVersion.occurs(result)
             return
         }
