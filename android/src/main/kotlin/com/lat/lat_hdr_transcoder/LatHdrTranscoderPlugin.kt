@@ -242,7 +242,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
     }
 
     private fun uriFromFilePath(path: String): Uri {
-        return FileProvider.getUriForFile(context, context.packageName, File(path))
+        return FileProvider.getUriForFile(context, context.packageName+ ".provider", File(path))
     }
 
 
