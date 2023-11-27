@@ -51,7 +51,7 @@ class _SelectedVideoState extends State<SelectedVideo> {
     setState(() {});
 
     try {
-      convertedPath = await LatHdrTranscoder().transcoding(widget.path);
+      convertedPath = await LatHdrTranscoder().transcoding(widget.path, 1);
     } on PlatformException catch (e) {
       debugPrint(e.toString());
     }
