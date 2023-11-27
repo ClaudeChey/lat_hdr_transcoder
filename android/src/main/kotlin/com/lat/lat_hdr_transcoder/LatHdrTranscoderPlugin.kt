@@ -191,7 +191,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
 
     @UnstableApi private fun hdrToneMap(): Int {
         return if (Build.VERSION.SDK_INT >= 33) {
-            Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_MEDIACODEC
+            Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         } else if (Build.VERSION.SDK_INT >= 29) {
             Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         } else {
