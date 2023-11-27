@@ -156,7 +156,7 @@ class LatHdrTranscoderPlugin : FlutterPlugin, MethodCallHandler, EventChannel.St
             ) {
 
                 log("${exportException.errorCode} ${exportException.errorCodeName}")
-                TranscodeErrorType.FailedTranscode.occurs(result, exportException.errorCodeName)
+               // TranscodeErrorType.FailedTranscode.occurs(result, exportException.errorCodeName)
                 result.success(null)
             }
 
