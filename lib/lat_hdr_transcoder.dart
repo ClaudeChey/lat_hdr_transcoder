@@ -26,7 +26,11 @@ class LatHdrTranscoder {
 
   // Convert the HDR video file to SDR
   // Make sure it is HDR before converting
-  Future<String?> transcoding(String path) {
+  Future<String?> transcoding(String path, [int? toneMap]) {
+    if (toneMap != null) {
+      return _methodChannel.invokeMethod<String>(
+          'transcoding', {'path': path, 'toneMap': toneMap});
+    }
     return _methodChannel.invokeMethod<String>('transcoding', {'path': path});
   }
 
