@@ -1,8 +1,6 @@
 # lat_hdr_transcoder
 
-
 [![pub package](https://img.shields.io/pub/v/lat_hdr_transcoder.svg)](https://pub.dartlang.org/packages/lat_hdr_transcoder)
-
 
 The purpose of this plugin is clear and simple
 
@@ -16,32 +14,24 @@ See the [example app](https://github.com/ClaudeChey/lat_hdr_transcoder/blob/main
 
 <br/>
 
-# Getting started
-
-```yaml
-dependencies:
-  lat_hdr_transcoder: ^1.0.0
-```
-
 # Android
 
-```transcoding``` supported 29+
-
+`transcoding` supported 29+
 
 # iOS
 
-```isHdr``` supported 14+
-
-
+`isHdr` supported 14+
 
 # How to use
 
 ## Check HDR format
+
 ```dart
 bool isHdr = await LatHdrTranscoder().isHdr(String path)
 ```
 
 ## Transcoding
+
 ```dart
 LatHdrTranscoder().onProgress.listen(dynamic value) {
     print(value) // 0.0 to 1.0
@@ -51,7 +41,7 @@ String? sdrVideoPath = await LatHdrTranscoder().transcoding(String path)
 ```
 
 ## Clear cache
+
 ```dart
 bool success = await LatHdrTranscoder().clearCache()
 ```
-
